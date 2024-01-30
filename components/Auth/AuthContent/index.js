@@ -29,14 +29,17 @@ function AuthContent({isLogin, onAuthenticate}) {
 
         if (!emailIsValid || !passwordIsValid || (!isLogin && (!emailsAreEqual || !passwordsAreEqual))) {
             Alert.alert('Invalid input', 'Please check your entered credentials.');
+
             setCredentialsInvalid({
                 email: !emailIsValid,
                 confirmEmail: !emailIsValid || !emailsAreEqual,
                 password: !passwordIsValid,
                 confirmPassword: !passwordIsValid || !passwordsAreEqual
             });
+
             return;
         }
+
         onAuthenticate({email, password});
     };
 

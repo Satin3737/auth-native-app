@@ -12,7 +12,7 @@ const AuthStack = () => {
         <Stack.Navigator
             screenOptions={{
                 headerStyle: {backgroundColor: Colors.primary500},
-                headerTintColor: 'white',
+                headerTintColor: Colors.white,
                 contentStyle: {backgroundColor: Colors.primary100}
             }}
         >
@@ -27,7 +27,7 @@ const AuthenticatedStack = () => {
         <Stack.Navigator
             screenOptions={{
                 headerStyle: {backgroundColor: Colors.primary500},
-                headerTintColor: 'white',
+                headerTintColor: Colors.white,
                 contentStyle: {backgroundColor: Colors.primary100}
             }}
         >

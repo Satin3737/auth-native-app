@@ -7,7 +7,6 @@ const CustomInput = ({label, keyboardType, secure, onUpdateValue, value, isInval
             <Text style={[styles.label, isInvalid && styles.labelInvalid]}>{label}</Text>
             <TextInput
                 style={[styles.input, isInvalid && styles.inputInvalid]}
-                autoCapitalize={false}
                 autoCapitalize="none"
                 keyboardType={keyboardType}
                 secureTextEntry={secure}
