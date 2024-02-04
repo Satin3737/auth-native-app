@@ -1,46 +1,51 @@
 import {Ionicons} from '@expo/vector-icons';
 import {useMemo} from 'react';
 import {Pressable, Text, View} from 'react-native';
+import {Colors} from '../../../const';
 import styles from './style';
 
-export const btnTypes = {
-    regular: 'regular',
-    flat: 'flat',
-    icon: 'icon'
+export const btnSettings = {
+    regular: {
+        type: 'regular',
+        btn: styles.regularButton,
+        text: styles.regularButtonText
+    },
+    flat: {
+        type: 'flat',
+        btn: styles.flatButton,
+        text: styles.flatButtonText
+    },
+    icon: {
+        type: 'icon',
+        btn: styles.iconButton,
+        props: {
+            name: 'exit',
+            color: Colors.white,
+            size: 24
+        }
+    }
 };
 
 const CustomButton = ({
     children = null,
-    type = btnTypes.regular,
+    type = btnSettings.regular.type,
     onPress = () => {},
     buttonStyles = [],
-    textStyles = []
+    textStyles = [],
+    iconProps = {}
 }) => {
-    const btnStyles = useMemo(() => ({
-        regular: {
-            btn: styles.regularButton,
-            text: styles.regularButtonText
-        },
-        flat: {
-            btn: styles.flatButton,
-            text: styles.flatButtonText
-        },
-        icon: {
-            btn: styles.iconButton,
-            text: null
-        }
-    }));
-
     return (
         <Pressable
-            style={({pressed}) => [btnStyles[type].btn, pressed && styles.pressed, ...buttonStyles]}
+            style={({pressed}) => [btnSettings[type].btn, pressed && styles.pressed, ...buttonStyles]}
             onPress={onPress}
         >
-            {type === btnTypes.icon ? (
-                <Ionicons name={icon} color={color} size={size} />
+            {type === btnSettings.icon.type ? (
+                useMemo(() => {
+                    return <Ionicons {...btnSettings.icon.props} {...iconProps} />;
+                }, [iconProps])
             ) : (
                 <View>
-                    <Text style={[btnStyles[type].text, ...textStyles]}>{children}</Text>
+                    <Text style={[btnSettings[type].text, ...textStyles]}>{children}</Text>
                 </View>
             )}
         </Pressable>

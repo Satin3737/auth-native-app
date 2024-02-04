@@ -1,17 +1,18 @@
 import {useNavigation} from '@react-navigation/native';
-import {useContext, useState} from 'react';
+import {useContext, useEffect, useState} from 'react';
 import {Alert, View} from 'react-native';
 import AuthApi from '../../../api/AuthApi';
 import {AuthContext} from '../../../store/AuthContext';
-import CustomButton, {btnTypes} from '../../ui/CustomButton';
+import CustomButton, {btnSettings} from '../../ui/CustomButton';
 import LoadingOverlay from '../../ui/LoadingOverlay';
 import AuthForm from '../AuthForm';
 import styles from './style';
 
-function AuthContent({isLogin}) {
-    const {replace} = useNavigation();
+function AuthContent() {
+    const navigation = useNavigation();
     const {login} = useContext(AuthContext);
     const {singUpUser, singInUser} = AuthApi();
+    const [isLogin, setIsLogin] = useState(true);
     const [loading, setLoading] = useState(false);
     const [credentialsInvalid, setCredentialsInvalid] = useState({
         email: false,
@@ -20,7 +21,7 @@ function AuthContent({isLogin}) {
         confirmPassword: false
     });
 
-    const switchAuthModeHandler = () => (isLogin ? replace('signup') : replace('login'));
+    const switchAuthModeHandler = () => setIsLogin(state => !state);
 
     const submitHandler = async credentials => {
         let {email, confirmEmail, password, confirmPassword} = credentials;
@@ -58,13 +59,17 @@ function AuthContent({isLogin}) {
         }
     };
 
+    useEffect(() => {
+        navigation.setOptions({title: isLogin ? 'Sign In' : 'Sign Up'});
+    }, [isLogin]);
+
     return loading ? (
         <LoadingOverlay message={isLogin ? 'Login...' : 'Creating user...'} />
     ) : (
         <View style={styles.authContent}>
             <AuthForm isLogin={isLogin} onSubmit={submitHandler} credentialsInvalid={credentialsInvalid} />
             <View style={styles.buttons}>
-                <CustomButton type={btnTypes.flat} onPress={switchAuthModeHandler}>
+                <CustomButton type={btnSettings.flat.type} onPress={switchAuthModeHandler}>
                     {isLogin ? 'Create a new user' : 'Log in instead'}
                 </CustomButton>
             </View>
