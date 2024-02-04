@@ -14,7 +14,7 @@ const AuthApi = () => {
             password,
             returnSecureToken: true
         });
-
+        console.log(res.data);
         return res?.data?.idToken;
     };
 
