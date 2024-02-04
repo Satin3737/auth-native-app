@@ -7,31 +7,25 @@ import WelcomeScreen from '../screens/WelcomeScreen';
 
 const Stack = createNativeStackNavigator();
 
+const defaultScreenOptions = {
+    headerStyle: {backgroundColor: Colors.primary500},
+    headerTintColor: Colors.white,
+    contentStyle: {backgroundColor: Colors.primary100}
+};
+
 const AuthStack = () => {
     return (
-        <Stack.Navigator
-            screenOptions={{
-                headerStyle: {backgroundColor: Colors.primary500},
-                headerTintColor: Colors.white,
-                contentStyle: {backgroundColor: Colors.primary100}
-            }}
-        >
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Signup" component={SignupScreen} />
+        <Stack.Navigator screenOptions={defaultScreenOptions}>
+            <Stack.Screen name={'login'} component={LoginScreen} options={{title: 'Log In'}} />
+            <Stack.Screen name={'signup'} component={SignupScreen} options={{title: 'Sign Up'}} />
         </Stack.Navigator>
     );
 };
 
 const AuthenticatedStack = () => {
     return (
-        <Stack.Navigator
-            screenOptions={{
-                headerStyle: {backgroundColor: Colors.primary500},
-                headerTintColor: Colors.white,
-                contentStyle: {backgroundColor: Colors.primary100}
-            }}
-        >
-            <Stack.Screen name="Welcome" component={WelcomeScreen} />
+        <Stack.Navigator screenOptions={defaultScreenOptions}>
+            <Stack.Screen name={'welcome'} component={WelcomeScreen} />
         </Stack.Navigator>
     );
 };

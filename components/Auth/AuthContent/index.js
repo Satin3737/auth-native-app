@@ -1,10 +1,18 @@
-import {useState} from 'react';
+import {useNavigation} from '@react-navigation/native';
+import {useContext, useState} from 'react';
 import {Alert, View} from 'react-native';
+import AuthApi from '../../../api/AuthApi';
+import {AuthContext} from '../../../store/AuthContext';
 import CustomButton, {btnTypes} from '../../ui/CustomButton';
+import LoadingOverlay from '../../ui/LoadingOverlay';
 import AuthForm from '../AuthForm';
 import styles from './style';
 
-function AuthContent({isLogin, onAuthenticate}) {
+function AuthContent({isLogin}) {
+    const {replace} = useNavigation();
+    const {login} = useContext(AuthContext);
+    const {singUpUser, singInUser} = AuthApi();
+    const [loading, setLoading] = useState(false);
     const [credentialsInvalid, setCredentialsInvalid] = useState({
         email: false,
         password: false,
@@ -12,18 +20,16 @@ function AuthContent({isLogin, onAuthenticate}) {
         confirmPassword: false
     });
 
-    const switchAuthModeHandler = () => {
-        // Todo
-    };
+    const switchAuthModeHandler = () => (isLogin ? replace('signup') : replace('login'));
 
-    const submitHandler = credentials => {
+    const submitHandler = async credentials => {
         let {email, confirmEmail, password, confirmPassword} = credentials;
 
         email = email.trim();
         password = password.trim();
 
         const emailIsValid = email.includes('@');
-        const passwordIsValid = password.length > 6;
+        const passwordIsValid = password.length > 7;
         const emailsAreEqual = email === confirmEmail;
         const passwordsAreEqual = password === confirmPassword;
 
@@ -40,10 +46,21 @@ function AuthContent({isLogin, onAuthenticate}) {
             return;
         }
 
-        onAuthenticate({email, password});
+        setLoading(true);
+
+        try {
+            login(isLogin ? await singInUser(email, password) : await singUpUser(email, password));
+        } catch (e) {
+            Alert.alert('Auth failed!', 'Please check your credentials');
+            console.log(e);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    return (
+    return loading ? (
+        <LoadingOverlay message={isLogin ? 'Login...' : 'Creating user...'} />
+    ) : (
         <View style={styles.authContent}>
             <AuthForm isLogin={isLogin} onSubmit={submitHandler} credentialsInvalid={credentialsInvalid} />
             <View style={styles.buttons}>
