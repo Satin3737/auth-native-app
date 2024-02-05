@@ -1,7 +1,6 @@
 import axios from 'axios';
 
 const AuthApi = () => {
-    const baseUrl = 'https://identitytoolkit.googleapis.com/v1/accounts';
     const apiKey = 'AIzaSyAz4xwJytD_ItXFtBPl8ivOME7eTgE6gg0';
     const authActions = {
         signUp: 'signUp',
@@ -9,21 +8,32 @@ const AuthApi = () => {
     };
 
     const authUser = async (authActions, email, password) => {
-        const res = await axios.post(`${baseUrl}:${authActions}?key=${apiKey}`, {
-            email,
-            password,
-            returnSecureToken: true
-        });
-        console.log(res.data);
-        return res?.data?.idToken;
+        const res = await axios.post(
+            `https://identitytoolkit.googleapis.com/v1/accounts:${authActions}?key=${apiKey}`,
+            {
+                email,
+                password,
+                returnSecureToken: true
+            }
+        );
+        return res?.data;
     };
 
     const singUpUser = (email, password) => authUser(authActions.signUp, email, password);
     const singInUser = (email, password) => authUser(authActions.signIn, email, password);
 
+    const refreshUserToken = async refreshToken => {
+        const res = await axios.post(`https://securetoken.googleapis.com/v1/token?key=${apiKey}`, {
+            grant_type: 'refresh_token',
+            refresh_token: refreshToken
+        });
+        return res?.data;
+    };
+
     return {
         singUpUser,
-        singInUser
+        singInUser,
+        refreshUserToken
     };
 };
 

@@ -10,7 +10,7 @@ const WelcomeScreen = () => {
 
     const testProtection = async () => {
         const res = await axios.get(
-            `https://auth-native-app-f03fc-default-rtdb.europe-west1.firebasedatabase.app/message.json?auth=${token}`
+            `https://auth-native-app-f03fc-default-rtdb.europe-west1.firebasedatabase.app/message.json?auth=${token.idToken}`
         );
         setFetchedText(res.data);
     };

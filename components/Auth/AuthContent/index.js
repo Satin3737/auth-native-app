@@ -50,7 +50,10 @@ function AuthContent() {
         setLoading(true);
 
         try {
-            login(isLogin ? await singInUser(email, password) : await singUpUser(email, password));
+            const {idToken, expiresIn, refreshToken} = isLogin
+                ? await singInUser(email, password)
+                : await singUpUser(email, password);
+            login({idToken, expiresIn, refreshToken});
         } catch (e) {
             Alert.alert('Auth failed!', 'Please check your credentials');
             console.log(e);

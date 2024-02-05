@@ -1,31 +1,68 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {createContext, useState} from 'react';
+import {createContext, useEffect, useState} from 'react';
+import AuthApi from '../api/AuthApi';
 
 export const AuthContext = createContext({
-    token: null,
+    token: {
+        idToken: null,
+        refreshToken: null,
+        expiresIn: null
+    },
+    isTimeToRefresh: false,
     isAuthenticated: false,
-    login: token => {},
+    login: tokenData => {},
     logout: () => {},
     getStoredToken: async () => {}
 });
 
 const AuthContextProvider = ({children}) => {
+    const {refreshUserToken} = AuthApi();
     const [token, setToken] = useState(null);
+    const [isTimeToRefresh, setIsTimeToRefresh] = useState(false);
+    const [refreshTimeoutId, setRefreshTimeoutId] = useState(undefined);
 
-    const login = token => {
-        setToken(token);
-        AsyncStorage.setItem('token', token);
+    const login = tokenData => {
+        setToken(tokenData);
+        startRefreshTimer(tokenData.expiresIn);
+        AsyncStorage.setItem('token', JSON.stringify(tokenData));
     };
 
     const logout = () => {
         setToken(null);
+        setIsTimeToRefresh(false);
+        clearTimeout(refreshTimeoutId);
+        setRefreshTimeoutId(undefined);
         AsyncStorage.removeItem('token');
     };
 
     const getStoredToken = async () => {
-        const storedToken = await AsyncStorage.getItem('token');
-        storedToken && setToken(storedToken);
+        const storedToken = JSON.parse(await AsyncStorage.getItem('token'));
+        if (storedToken) {
+            const {
+                id_token: idToken,
+                expires_in: expiresIn,
+                refresh_token: refreshToken
+            } = await refreshUserToken(storedToken.refreshToken);
+            setToken({idToken, refreshToken, expiresIn});
+            startRefreshTimer(expiresIn);
+        }
     };
+
+    const startRefreshTimer = expiresIn => {
+        const timer = setTimeout(() => setIsTimeToRefresh(true), (expiresIn * 1000) / 2);
+        setRefreshTimeoutId(timer);
+    };
+
+    useEffect(() => {
+        if (isTimeToRefresh) {
+            refreshUserToken(token.refreshToken).then(res => {
+                const {id_token: idToken, expires_in: expiresIn, refresh_token: refreshToken} = res;
+                setToken({idToken, refreshToken, expiresIn});
+                setIsTimeToRefresh(false);
+                startRefreshTimer(expiresIn);
+            });
+        }
+    }, [isTimeToRefresh]);
 
     const value = {
         token,
